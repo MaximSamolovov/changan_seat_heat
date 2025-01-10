@@ -1,4 +1,5 @@
 import 'package:changan_seat_heat/automotive_store.dart';
+import 'package:changan_seat_heat/generated/assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
@@ -22,7 +23,7 @@ class HomePage extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Image.asset(
-            "assets/images/chair.png",
+            Assets.imagesChair,
             color: charColor,
             // height: 100,
           ),
@@ -113,17 +114,17 @@ class HomePage extends StatelessWidget {
                         ButtonSegment(
                             value: SeatHeatTempThreshold.low,
                             label: Text(
-                                "${SeatHeatTempThreshold.low.getTempInCelcius} °C",
+                                "${SeatHeatTempThreshold.low.getTempInCelsius} °C",
                                 style: textStyle2)),
                         ButtonSegment(
                             value: SeatHeatTempThreshold.medium,
                             label: Text(
-                                "${SeatHeatTempThreshold.medium.getTempInCelcius} °C",
+                                "${SeatHeatTempThreshold.medium.getTempInCelsius} °C",
                                 style: textStyle2)),
                         ButtonSegment(
                             value: SeatHeatTempThreshold.high,
                             label: Text(
-                                "${SeatHeatTempThreshold.high.getTempInCelcius} °C",
+                                "${SeatHeatTempThreshold.high.getTempInCelsius} °C",
                                 style: textStyle2))
                       ],
                       selected: {heatThreshold},
@@ -134,7 +135,7 @@ class HomePage extends StatelessWidget {
                             selection.first is SeatHeatTempThreshold) {
                           final temp =
                           selection.first as SeatHeatTempThreshold;
-                          store.setSeatAutoHeatTempTheshold(
+                          store.setSeatAutoHeatTempThreshold(
                             isDriver,
                             temp,
                           );
