@@ -207,12 +207,12 @@ mixin _$AutomotiveStore on AutomotiveStoreBase, Store {
   }
 
   @override
-  void setSeatAutoHeatTempTheshold(
+  void setSeatAutoHeatTempThreshold(
       bool isDriverSeat, SeatHeatTempThreshold temp) {
     final _$actionInfo = _$AutomotiveStoreBaseActionController.startAction(
-        name: 'AutomotiveStoreBase.setSeatAutoHeatTempTheshold');
+        name: 'AutomotiveStoreBase.setSeatAutoHeatTempThreshold');
     try {
-      return super.setSeatAutoHeatTempTheshold(isDriverSeat, temp);
+      return super.setSeatAutoHeatTempThreshold(isDriverSeat, temp);
     } finally {
       _$AutomotiveStoreBaseActionController.endAction(_$actionInfo);
     }

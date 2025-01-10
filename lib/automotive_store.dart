@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:android_automotive_plugin/android_automotive_plugin.dart';
 import 'package:android_automotive_plugin/car/car_property_value.dart';
@@ -49,7 +47,7 @@ enum SeatHeatTempThreshold {
 }
 
 extension SeatHeatTempThresholdTemp on SeatHeatTempThreshold {
-  int get getTempInCelcius {
+  int get getTempInCelsius {
     switch (this) {
       case SeatHeatTempThreshold.low:
         return 0;
@@ -150,7 +148,7 @@ abstract class AutomotiveStoreBase with Store {
   }
 
   @action
-  void setSeatAutoHeatTempTheshold(
+  void setSeatAutoHeatTempThreshold(
       bool isDriverSeat, SeatHeatTempThreshold temp) {
     if (isDriverSeat) {
       _driverSeatAutoHeatTempThreshold = temp;
@@ -183,7 +181,7 @@ abstract class AutomotiveStoreBase with Store {
         final temp = await _carHvacManager.getInsideTemperature();
         final insideTemp = temp;
 
-        _log += ">>>>>>>>>>>>>>>>>>>>[insideTemp] ${insideTemp} \n\n\n";
+        _log += ">>>>>>>>>>>>>>>>>>>>[insideTemp] $insideTemp \n\n\n";
       } else if (carPropertyValue.propertyId ==
           VehiclePropertyIds.HVAC_SEAT_TEMPERATURE) {
         if (carPropertyValue.areaId == VehicleAreaSeat.SEAT_MAIN_DRIVER) {

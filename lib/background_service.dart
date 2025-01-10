@@ -143,7 +143,7 @@ _onCarSensorEvent(CarSensorEvent carSensorEvent) async {
 
         // enable driver seat
         if (driverSeatAutoHeatTime != SeatHeatTime.off &&
-            insideTemp < driverSeatAutoHeatTempThreshold.getTempInCelcius
+            insideTemp < driverSeatAutoHeatTempThreshold.getTempInCelsius
         //
         ) {
           //
@@ -160,7 +160,7 @@ _onCarSensorEvent(CarSensorEvent carSensorEvent) async {
 
         // enable passenger seat
         if (passengerSeatAutoHeatTime != SeatHeatTime.off &&
-            insideTemp < passengerSeatAutoHeatTempThreshold.getTempInCelcius
+            insideTemp < passengerSeatAutoHeatTempThreshold.getTempInCelsius
         //
         ) {
           //
