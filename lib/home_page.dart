@@ -1,4 +1,5 @@
 import 'package:changan_seat_heat/automotive_store.dart';
+import 'package:changan_seat_heat/generated/assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
@@ -22,7 +23,7 @@ class HomePage extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Image.asset(
-            "assets/images/chair.png",
+            Assets.imagesChair,
             color: charColor,
             // height: 100,
           ),
