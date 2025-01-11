@@ -9,24 +9,6 @@ part of 'automotive_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$AutomotiveStore on AutomotiveStoreBase, Store {
-  late final _$_logAtom =
-  Atom(name: 'AutomotiveStoreBase._log', context: context);
-
-  String get log {
-    _$_logAtom.reportRead();
-    return super._log;
-  }
-
-  @override
-  String get _log => log;
-
-  @override
-  set _log(String value) {
-    _$_logAtom.reportWrite(value, super._log, () {
-      super._log = value;
-    });
-  }
-
   late final _$_ignitionOnAtom =
   Atom(name: 'AutomotiveStoreBase._ignitionOn', context: context);
 
@@ -207,12 +189,12 @@ mixin _$AutomotiveStore on AutomotiveStoreBase, Store {
   }
 
   @override
-  void setSeatAutoHeatTempThreshold(
+  void setSeatAutoHeatTempTheshold(
       bool isDriverSeat, SeatHeatTempThreshold temp) {
     final _$actionInfo = _$AutomotiveStoreBaseActionController.startAction(
-        name: 'AutomotiveStoreBase.setSeatAutoHeatTempThreshold');
+        name: 'AutomotiveStoreBase.setSeatAutoHeatTempTheshold');
     try {
-      return super.setSeatAutoHeatTempThreshold(isDriverSeat, temp);
+      return super.setSeatAutoHeatTempTheshold(isDriverSeat, temp);
     } finally {
       _$AutomotiveStoreBaseActionController.endAction(_$actionInfo);
     }

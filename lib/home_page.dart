@@ -1,9 +1,7 @@
 import 'package:changan_seat_heat/automotive_store.dart';
-import 'package:changan_seat_heat/generated/assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
-import 'log_page.dart';
 
 class HomePage extends StatelessWidget {
   final AutomotiveStore store;
@@ -18,50 +16,82 @@ class HomePage extends StatelessWidget {
     Widget buildChairSegment(bool isDriver, int seatHeatLevel,
         SeatHeatTime heatTime, SeatHeatTempThreshold heatThreshold) {
       const charColor = Colors.white10;
+
       final chairSegment = Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset(
-            Assets.imagesChair,
-            color: charColor,
-            // height: 100,
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                // Изменяем уровень нагрева от 0 до 3
+                final newLevel = (seatHeatLevel + 1) % 4;
+                store.setSeatHeatLevel(isDriver, newLevel);
+              },
+              borderRadius: BorderRadius.circular(12),
+              splashColor: Colors.transparent, // Убираем красный цвет при нажатии
+              highlightColor: Colors.transparent, // Убираем выделение при нажатии
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16.0), // Увеличение padding
+                    child: Image.asset(
+                      "assets/images/single_chair.png",
+                      color: Colors.white, // Основное изображение кресла
+                    ),
+                  ),
+                  // Уровни нагрева, смещенные вниз
+                  if (seatHeatLevel == 1)
+                    Positioned(
+                      bottom: 100, // Отступ снизу, чтобы картинка была ближе к креслу
+                      child: Image.asset("assets/images/chair_heat_level_one.png"),
+                    ),
+                  if (seatHeatLevel == 2)
+                    Positioned(
+                      bottom: 100, // Отступ снизу, чтобы картинка была ближе к креслу
+                      child: Image.asset("assets/images/chair_heat_level_two.png"),
+                    ),
+                  if (seatHeatLevel == 3)
+                    Positioned(
+                      bottom: 100, // Отступ снизу, чтобы картинка была ближе к креслу
+                      child: Image.asset("assets/images/chair_heat_level_three.png"),
+                    ),
+                  if (seatHeatLevel == 0)
+                    Positioned(
+                      bottom: 100, // Отступ снизу, чтобы картинка была ближе к креслу
+                      child: Image.asset("assets/images/chair_level_off.png"),
+                    ),
+                ],
+              ),
+            ),
           ),
           const SizedBox(height: 8),
-          Row(
-            children: [
-              const SizedBox(width: 8),
-              Icon(
-                Icons.circle_rounded,
-                color: seatHeatLevel > 0 ? Colors.red : charColor,
-              ),
-              Icon(
-                Icons.circle_rounded,
-                color: seatHeatLevel > 1 ? Colors.red : charColor,
-              ),
-              Icon(
-                Icons.circle_rounded,
-                color: seatHeatLevel > 2 ? Colors.red : charColor,
-              ),
-            ],
+          // Добавляем текст ниже изображения кресла
+          Text(
+            isDriver ? "Водитель" : "Пассажир",
+            style: const TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.w400,
+              color: Colors.white,
+            ),
           ),
         ],
       );
+
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-              (isDriver ? "Водительское сиденье" : "Пассажирское сиденье")
-                  .toUpperCase(),
-              style: textStyle),
+
           const SizedBox(height: 24),
           Row(
             children: [
               if (!isDriver) ...[
                 chairSegment,
-                const SizedBox(width: 72),
+                const SizedBox(width: 22),
               ],
               Column(
                 crossAxisAlignment: isDriver
@@ -69,80 +99,97 @@ class HomePage extends StatelessWidget {
                     : CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text("Включать автоподогрев", style: textStyle2),
+                  const Text("Время работы автоподогрева (минут)", style: textStyle2),
                   const SizedBox(height: 16),
                   SizedBox(
                     width: 500,
-                    child: SegmentedButton(
-                      segments: [
-                        const ButtonSegment(
-                            value: SeatHeatTime.off,
-                            label: Text("откл.", style: textStyle2)),
-                        ButtonSegment(
-                            value: SeatHeatTime.short,
-                            label: Text(
-                                "${SeatHeatTime.short.getDurationInMinutes} мин",
-                                style: textStyle2)),
-                        ButtonSegment(
-                            value: SeatHeatTime.medium,
-                            label: Text(
-                                "${SeatHeatTime.medium.getDurationInMinutes} мин",
-                                style: textStyle2)),
-                        ButtonSegment(
-                            value: SeatHeatTime.long,
-                            label: Text(
-                                "${SeatHeatTime.long.getDurationInMinutes} мин",
-                                style: textStyle2))
+                    child: Column(
+                      children: [
+                        SliderTheme(
+                          data: SliderTheme.of(context).copyWith(
+                            trackHeight: 20.0, // Толщина трека
+                            activeTrackColor: Colors.blue, // Цвет активной части трека
+                            inactiveTrackColor: Colors.grey.shade300, // Цвет неактивной части
+                            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12), // Размер бегунка
+                            overlayShape: const RoundSliderOverlayShape(overlayRadius: 20), // Размер тени вокруг бегунка
+                            tickMarkShape: const RoundSliderTickMarkShape(), // Форма разделителей
+                            activeTickMarkColor: Colors.blue, // Цвет активных разделителей
+                            inactiveTickMarkColor: Colors.grey.shade500, // Цвет неактивных разделителей
+                          ),
+                          child: Slider(
+                            value: heatTime.index.toDouble(),
+                            min: 0,
+                            max: 6,
+                            divisions: 6, // Количество разделителей соответствует количеству опций
+                            label: SeatHeatTime.values[heatTime.index]
+                                .getDurationInMinutes
+                                .toString(), // Подпись текущего значения
+                            onChanged: (selection) {
+                              final selectedTime = SeatHeatTime.values[selection.toInt()];
+                              store.setSeatAutoHeatTime(isDriver, selectedTime);
+                            },
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: SeatHeatTime.values.map((time) {
+                            return Text(
+                              time == SeatHeatTime.off
+                                  ? "откл."
+                                  : "${time.getDurationInMinutes} ",
+                              style: textStyle2.copyWith(fontSize: 14), // Уменьшенный шрифт для подписей
+                            );
+                          }).toList(),
+                        ),
                       ],
-                      selected: {heatTime},
-                      onSelectionChanged: (selection) {
-                        store.setSeatAutoHeatTime(
-                          isDriver,
-                          selection.first,
-                        );
-                      },
                     ),
                   ),
+
                   const SizedBox(height: 32),
-                  const Text("когда температура в салоне ниже",
-                      style: textStyle2),
+                  const Text("Включать когда температура в салоне ниже (°C)", style: textStyle2),
                   const SizedBox(height: 16),
                   SizedBox(
-                    width: 400,
-                    child: SegmentedButton(
-                      segments: [
-                        ButtonSegment(
-                            value: SeatHeatTempThreshold.low,
-                            label: Text(
-                                "${SeatHeatTempThreshold.low.getTempInCelsius} °C",
-                                style: textStyle2)),
-                        ButtonSegment(
-                            value: SeatHeatTempThreshold.medium,
-                            label: Text(
-                                "${SeatHeatTempThreshold.medium.getTempInCelsius} °C",
-                                style: textStyle2)),
-                        ButtonSegment(
-                            value: SeatHeatTempThreshold.high,
-                            label: Text(
-                                "${SeatHeatTempThreshold.high.getTempInCelsius} °C",
-                                style: textStyle2))
+                    width: 500,
+                    child: Column(
+                      children: [
+                        SliderTheme(
+                          data: SliderTheme.of(context).copyWith(
+                            trackHeight: 20.0, // Толщина трека
+                            activeTrackColor: Colors.red, // Цвет активной части трека
+                            inactiveTrackColor: Colors.grey.shade300, // Цвет неактивной части
+                            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12), // Размер бегунка
+                            overlayShape: const RoundSliderOverlayShape(overlayRadius: 20), // Размер тени вокруг бегунка
+                            tickMarkShape: const RoundSliderTickMarkShape(), // Форма разделителей
+                            activeTickMarkColor: Colors.red, // Цвет активных разделителей
+                            inactiveTickMarkColor: Colors.grey.shade500, // Цвет неактивных разделителей
+                          ),
+                          child: Slider(
+                            value: heatThreshold.index.toDouble(),
+                            min: 0,
+                            max: 5,
+                            divisions: 5, // Количество разделителей
+                            label: SeatHeatTempThreshold.values[heatThreshold.index].getTempInCelcius.toString(),
+                            onChanged: heatTime == SeatHeatTime.off
+                                ? null
+                                : (value) {
+                              final selectedThreshold = SeatHeatTempThreshold.values[value.toInt()];
+                              store.setSeatAutoHeatTempTheshold(isDriver, selectedThreshold);
+                            },
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: SeatHeatTempThreshold.values.map((threshold) {
+                            return Text(
+                              "${threshold.getTempInCelcius}",
+                              style: textStyle2.copyWith(fontSize: 14), // Уменьшенный шрифт для подписей
+                            );
+                          }).toList(),
+                        ),
                       ],
-                      selected: {heatThreshold},
-                      onSelectionChanged: heatTime == SeatHeatTime.off
-                          ? null
-                          : (selection) {
-                        if (selection.isNotEmpty &&
-                            selection.first is SeatHeatTempThreshold) {
-                          final temp =
-                          selection.first as SeatHeatTempThreshold;
-                          store.setSeatAutoHeatTempThreshold(
-                            isDriver,
-                            temp,
-                          );
-                        }
-                      },
                     ),
                   ),
+
                 ],
               ),
               if (isDriver) ...[
@@ -179,25 +226,10 @@ class HomePage extends StatelessWidget {
                       "ТЕМПЕРАТУРА В САЛОНЕ ${store.insideTemp == null ? "--" : store.insideTemp!}°C",
                       style: textStyle),
                   const Spacer(),
-                  TextButton(
-                    onPressed: () {
-                      store.setTestCover();
-                    },
-                    child: const Text("Test Cover"),
-                  ),
-                  const SizedBox(width: 16),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => LogPage(automotiveStore: store),
-                        ),
-                      );
-                    },
-                    child: const Text("Logs"),
-                  ),
-                  const SizedBox(width: 40),
+
+                 // const SizedBox(width: 16),
+
+                 // const SizedBox(width: 40),
                 ],
               ),
             ),

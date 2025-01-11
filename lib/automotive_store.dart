@@ -1,18 +1,13 @@
 import 'dart:async';
-
 import 'package:android_automotive_plugin/android_automotive_plugin.dart';
 import 'package:android_automotive_plugin/car/car_property_value.dart';
 import 'package:android_automotive_plugin/car/car_sensor_event.dart';
 import 'package:android_automotive_plugin/car/car_sensor_types.dart';
 import 'package:android_automotive_plugin/car/hvac_manager.dart';
-import 'package:android_automotive_plugin/car/hvac_property_ids.dart';
-import 'package:android_automotive_plugin/car/ignition_state.dart';
 import 'package:android_automotive_plugin/car/sensor_manager.dart';
-import 'package:android_automotive_plugin/car/vehicle_area_in_out_car.dart';
+
 import 'package:android_automotive_plugin/car/vehicle_area_seat.dart';
 import 'package:android_automotive_plugin/car/vehicle_property_ids.dart';
-import 'package:changan_seat_heat/file_writer.dart';
-import 'package:flutter/services.dart';
 import 'package:mobx/mobx.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,8 +16,11 @@ part 'automotive_store.g.dart';
 enum SeatHeatTime {
   off,
   short,
+  short1,
   medium,
+  medium1,
   long,
+  long1,
 }
 
 extension SeatHeatTimeDuration on SeatHeatTime {
@@ -31,30 +29,45 @@ extension SeatHeatTimeDuration on SeatHeatTime {
       case SeatHeatTime.off:
         return 0;
       case SeatHeatTime.short:
-        return 3;
-      case SeatHeatTime.medium:
         return 5;
+      case SeatHeatTime.short1:
+        return 10;
+      case SeatHeatTime.medium:
+        return 15;
+      case SeatHeatTime.medium1:
+        return 20;
       case SeatHeatTime.long:
-        return 7;
+        return 25;
+      case SeatHeatTime.long1:
+        return 30;
     }
   }
 }
 
 enum SeatHeatTempThreshold {
   low,
+  low1,
   medium,
+  medium1,
   high,
+  high1,
 }
 
 extension SeatHeatTempThresholdTemp on SeatHeatTempThreshold {
-  int get getTempInCelsius {
+  int get getTempInCelcius {
     switch (this) {
       case SeatHeatTempThreshold.low:
         return 0;
+      case SeatHeatTempThreshold.low1:
+        return 5;
       case SeatHeatTempThreshold.medium:
-        return 7;
-      case SeatHeatTempThreshold.high:
+        return 10;
+      case SeatHeatTempThreshold.medium1:
         return 15;
+      case SeatHeatTempThreshold.high:
+        return 20;
+      case SeatHeatTempThreshold.high1:
+        return 25;
     }
   }
 }
@@ -65,39 +78,25 @@ abstract class AutomotiveStoreBase with Store {
   late final AndroidAutomotivePlugin _androidAutomotivePlugin;
   late final CarHvacManager _carHvacManager;
   late final CarSensorManager _carSensorManager;
-
+  static const int _InOutCAR_INSIDE = 1;/////
   AutomotiveStoreBase() {
-    _log += "initialize AutomotiveStoreBase\n\n";
     _loadSettings().whenComplete(() async {
-      _log += "initialize AndroidAutomotivePlugin\n\n";
       _androidAutomotivePlugin = AndroidAutomotivePlugin();
-
-      _log += "initialize CarHvacManager\n\n";
       _carHvacManager = CarHvacManager(_androidAutomotivePlugin);
-
-      _log += "initialize CarSensorManager\n\n";
       _carSensorManager = CarSensorManager(_androidAutomotivePlugin);
-
       _androidAutomotivePlugin.onHvacChangeEventCallback = _onHvacChangeEvent;
       _androidAutomotivePlugin.onCarSensorEventCallback = _onCarSensorEvent;
-
-      _androidAutomotivePlugin.onLogCallback = (log) {
-        _log += "$log\n\n";
-      };
 
       try {
         await _androidAutomotivePlugin.connect();
 
         int ignitionState = await _carSensorManager.getIgnitionState();
-        _ignitionOn = ignitionState == IgnitionState.IGNITION_STATE_ON;
+        _ignitionOn = ignitionState == 4;
       } catch (e) {
-        _log += "${e.toString()}\n\n";
+        // Handle connection errors if necessary
       }
     });
   }
-
-  @readonly
-  String _log = "";
 
   @readonly
   bool _ignitionOn = false;
@@ -148,7 +147,7 @@ abstract class AutomotiveStoreBase with Store {
   }
 
   @action
-  void setSeatAutoHeatTempThreshold(
+  void setSeatAutoHeatTempTheshold(
       bool isDriverSeat, SeatHeatTempThreshold temp) {
     if (isDriverSeat) {
       _driverSeatAutoHeatTempThreshold = temp;
@@ -165,23 +164,17 @@ abstract class AutomotiveStoreBase with Store {
     if (carSensorEvent.sensorType ==
         CarSensorTypes.SENSOR_TYPE_IGNITION_STATE) {
       int ignitionState = carSensorEvent.intValues.first;
-      _ignitionOn = ignitionState == IgnitionState.IGNITION_STATE_ON;
+      _ignitionOn = ignitionState == 4;
     }
   }
 
   _onHvacChangeEvent(CarPropertyValue carPropertyValue) async {
     try {
-      if (carPropertyValue.propertyId ==
-          CarHvacPropertyIds.ID_HVAC_IN_OUT_TEMP) {
-        if (carPropertyValue.areaId == VehicleAreaInOutCAR.InOutCAR_INSIDE) {
+      if (carPropertyValue.propertyId ==675289370) {
+        if (carPropertyValue.areaId == _InOutCAR_INSIDE) {
           _insideTemp =
               ((double.tryParse(carPropertyValue.value) ?? 0) - 84) / 2;
         }
-
-        final temp = await _carHvacManager.getInsideTemperature();
-        final insideTemp = temp;
-
-        _log += ">>>>>>>>>>>>>>>>>>>>[insideTemp] $insideTemp \n\n\n";
       } else if (carPropertyValue.propertyId ==
           VehiclePropertyIds.HVAC_SEAT_TEMPERATURE) {
         if (carPropertyValue.areaId == VehicleAreaSeat.SEAT_MAIN_DRIVER) {
@@ -191,28 +184,11 @@ abstract class AutomotiveStoreBase with Store {
         }
       }
     } catch (e) {
-      _log += ">>>>>>>>>>>>>>>>>>>>[_onHvacChangeEvent] ${e.toString()} \n\n\n";
+      // Handle errors if necessary
     }
   }
 
-  Future<void> setTestCover() async {
-    final asset = await rootBundle.load("assets/images/flutter-logo.jpg");
-    final buffer = asset.buffer;
-    final file = await FileWriter.writeFileToDownloadsDir(
-        buffer.asUint8List(asset.offsetInBytes, asset.lengthInBytes),
-        "cover.jpg");
 
-    String path = file.absolute.path.replaceAll('//', '/');
-    _log += "setTestCover $path\n\n";
-
-    try {
-      final res = await _androidAutomotivePlugin
-          .setVehicleSettingMusicAlbumPictureFilePath(path);
-      _log += "setTestCover OK: $res\n\n";
-    } catch (e) {
-      _log += "setTestCover ERROR ${e.toString()}\n\n";
-    }
-  }
 
   //////////////////////////////
 

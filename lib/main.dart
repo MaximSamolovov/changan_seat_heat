@@ -1,14 +1,9 @@
-import 'dart:convert';
-import 'dart:io';
-import 'dart:async';
-
-import 'package:android_automotive_plugin/car/hvac_property_ids.dart';
-import 'package:android_automotive_plugin/car/vehicle_area_seat.dart';
-import 'package:changan_seat_heat/accessibility_service.dart';
 import 'package:changan_seat_heat/automotive_store.dart';
-import 'package:changan_seat_heat/background_service.dart';
 import 'package:changan_seat_heat/home_page.dart';
 import 'package:flutter/material.dart';
+
+import 'accessibility_service.dart';
+import 'background_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
