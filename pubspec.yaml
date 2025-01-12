@@ -22,10 +22,14 @@ dependencies:
   filling_slider: ^0.0.3
   slider_controller: ^0.0.5
 
+#  android_automotive_plugin:
+#    git:
+#      url: git@github.com:MaximSamolovov/changan_car_flutter_library.git
+#      ref: 0.1.0
   android_automotive_plugin:
     git:
-      url: git@github.com:MaximSamolovov/changan_car_flutter_library.git
-      ref: 0.1.0
+      url: git@github.com:abuharsky/changan_car_flutter_library.git
+
 
 
 dev_dependencies:
